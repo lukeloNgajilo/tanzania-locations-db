@@ -2,8 +2,7 @@
 
 ## Quick Introduction
 
-Tanzania locations, All Regions from Tanzania, with their respective Districts
- wards & streets.
+Tanzania locations, All Regions from Tanzania, with their respective Districts wards & streets.
 
 Very useful for easily implementing Tanzania locations in any application.
 
@@ -13,65 +12,53 @@ What you need before running the code.
 
 1. Install & Start Postgresql Db Service
 
-2. Copy files from location-files to a top level directory `/posts/...`
-this is necessary for postgresql `Copy` command to function as expected [refer to this question](https://stackoverflow.com/a/48881550/2405689).
+2. Extract everything
 
-3. Give user `postgres` full permissions to `/posts` directory with
+- Give setup.sh execute permission with `chmod +x ./setup.sh`
 
-`sudo chmod -R postgres:postgres /posts`
+- Run the setup file with `./setup.sh`
 
-4. Create your locations database owned by `postgres` user
+- Close PL/PgSQL prompts with `:q` whenever prompted, this will happen in the last phrase of data extraction, which you
+  will need to close the prompt for it to continue eg. "save_regions" etc..
 
-`createdb --encoding utf8 --password --owner postgres DATABASE_NAME`
+3. This will create a database called locations that will have user postgres and have all the data.
 
-Option `--password` will prompt you to enter password for the Db.
+4. You can check the data with `psql -U postgres -d locations` and run queries like `SELECT * FROM regions;` to verify
+   the data.
 
-5. Use `psql DATABASE_NAME` to enter into the database.
+## For Docker
 
-6. Extract everything
+1. Pull image 
+```
+docker pull archnoob/tanzania-locations-db
+```
 
-  - Create Tables `\i tables_creation.sql` 
-
-  - Copy regions information to `general table` with `\i general.sql` (Don't judge the repetition)
-
-  - Extract countries `\i countries.sql` 
-
-  - Extract all Tanzania locations `\i extract.sql`
-
-
-7. Done!
-
-
-### Room for improvements
-
-1. Locations (Region, District & Wards) need to use a different auto-incrementing ID field and not it's area code.
-
-The area code should stay as is (in it's field), but there should be
-a different ID field this will help reduce mixing the IDs once we get broader
-than just one country.
-
-2. This whole process can easily be automated.
-
-3. At least we should start with `general.sql` as I'm really not proud of it.
-
-4. API for this will be awesome!
-
-### Reference
-
-This data was obtained from [TCRA POSTCODE
-LIST](https://www.tcra.go.tz/index.php/publication-and-statistics/postcode-list)
-we are by no means fully responsible for it's accuracy.
-
+2. After pulling the image, create a .env file based on the provided template:
+```
+cp env.example .env
+```
+3. Run with Docker Compose (Recommended)
+```
+docker-compose up -d
+```
+4. Or run mannually (with env vars)
+```
+docker run -d \
+  --name tanzania-locations \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=locations \
+  archnoob/tanzania-locations-db
+```
 
 ### Credits
 
-Process of data standardization was the most complicated and I was helped by
-a few friends whom I promised to credit.
+A few folks made this happen, from standardizing the data to creating the
+database, writing the scripts and testing. Thank you all for your
+contributions.
 
 1. Natali Isuja
-
 2. Joe Master
-
 3. Robert Mnama
-
-4. And of course [TCRA](https://tcra.go.tz) for publishing this information.
+4. [Ano Rebel](https://github.com/AnoRebel/)
+5. [Zacharia23](https://github.com/Zacharia23)
